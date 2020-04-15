@@ -4,9 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import de.dhelleberg.bleadvertiserscanner.data.BLEDevice
+import de.dhelleberg.bleadvertiserscanner.data.BLERepository
 
-class PageViewModel : ViewModel() {
+class PageViewModel(val repo: BLERepository): ViewModel() {
 
     private val _index = MutableLiveData<Int>()
     val text: LiveData<String> = Transformations.map(_index) {
@@ -16,4 +17,6 @@ class PageViewModel : ViewModel() {
     fun setIndex(index: Int) {
         _index.value = index
     }
+
+
 }
