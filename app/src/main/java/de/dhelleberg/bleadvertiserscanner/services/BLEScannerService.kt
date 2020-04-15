@@ -9,6 +9,7 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.Intent
+import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
 import android.util.Log
@@ -22,8 +23,12 @@ class BLEScannerService : Service() {
 
     private var scanning: Boolean = false
     private var bluetoothAdapter: BluetoothAdapter? = null
-    val bleRepository : BLERepository by inject()
+    private val bleRepository : BLERepository by inject()
     private lateinit var handler: Handler
+    // Binder given to clients
+    private val binder = LocalBinder()
+
+    var scanEnabled : Boolean = true
 
     override fun onCreate() {
         super.onCreate()
@@ -33,19 +38,17 @@ class BLEScannerService : Service() {
         startScanning()
     }
 
-    private fun startScanning() {
-        if(!scanning) {
+
+
+    fun startScanning() {
+        if(!scanning && scanEnabled) {
             scanning = true
+            bleRepository.updateScanStatus("scanning...")
             bluetoothAdapter?.bluetoothLeScanner?.startScan(
                 buildScanFilters(),
                 buildScanSettings(),
                 bleScanner
             )
-            //ToDo: add timeout
-
-            // Will stop the scanning after a set time.
-
-            // Will stop the scanning after a set time.
             handler.postDelayed(
                 Runnable { stopScanning() },
                 Constants.SCAN_PERIOD
@@ -55,10 +58,16 @@ class BLEScannerService : Service() {
 
     private fun stopScanning() {
         scanning = false
+        bleRepository.updateScanStatus("paused")
         Log.d(TAG, "Scan stopped")
         // Stop the scan, wipe the callback.
         bluetoothAdapter?.bluetoothLeScanner?.stopScan(bleScanner)
+        // wait until re-scanning
 
+        handler.postDelayed(
+            Runnable { startScanning() },
+            Constants.SCAN_PAUSE
+        )
     }
     /**
      * Return a List of [ScanFilter] objects to filter by Service UUID.
@@ -77,9 +86,6 @@ class BLEScannerService : Service() {
         return builder.build()
     }
 
-    override fun onBind(p0: Intent?): IBinder? {
-        TODO("Not yet implemented")
-    }
 
     private val bleScanner = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
@@ -107,4 +113,12 @@ class BLEScannerService : Service() {
         }
     }
 
+    inner class LocalBinder : Binder() {
+        // Return this instance of LocalService so clients can call public methods
+        fun getService(): BLEScannerService = this@BLEScannerService
+    }
+
+    override fun onBind(intent: Intent): IBinder {
+        return binder
+    }
 }

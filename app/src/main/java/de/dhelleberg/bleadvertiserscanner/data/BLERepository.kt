@@ -10,6 +10,8 @@ interface BLERepository {
 
     fun addDeviceToCurrentScanResult(device: BLEDevice)
     fun getDeviceList(): LiveData<List<BLEDevice>>
+    fun getScanStatus(): LiveData<String>
+    fun updateScanStatus(status: String)
 }
 
 class BLERepositoryImpl (private val context : Context) : BLERepository {
@@ -17,9 +19,12 @@ class BLERepositoryImpl (private val context : Context) : BLERepository {
 
     private val deviceList = ArrayList<BLEDevice>()
     private val result = MutableLiveData<List<BLEDevice>>()
+    private val scanStatus = MutableLiveData<String>()
     init {
         result.value = ArrayList()
     }
+
+
 
     override fun addDeviceToCurrentScanResult(device: BLEDevice) {
         Log.d(TAG, "add device $device")
@@ -33,5 +38,15 @@ class BLERepositoryImpl (private val context : Context) : BLERepository {
     override fun getDeviceList(): LiveData<List<BLEDevice>> {
         return result
     }
+
+    override fun getScanStatus(): LiveData<String> {
+        return scanStatus
+    }
+
+    override fun updateScanStatus(status: String) {
+        scanStatus.value = status
+    }
+
+
 
 }

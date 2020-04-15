@@ -18,6 +18,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
+import de.dhelleberg.bleadvertiserscanner.services.BLEAdvertisingService
 import de.dhelleberg.bleadvertiserscanner.services.BLEScannerService
 
 import de.dhelleberg.bleadvertiserscanner.ui.scan.ScanResultFragment
@@ -68,6 +69,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         startService(Intent(this, BLEScannerService::class.java))
+        startService(Intent(this, BLEAdvertisingService::class.java))
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
@@ -100,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         override fun getItemCount(): Int = 2
 
         override fun createFragment(position: Int): Fragment {
-            return ScanResultFragment()
+            return ScanResultFragment.newInstance()
         }
     }
 }

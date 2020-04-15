@@ -11,4 +11,8 @@ class BLEDevicesViewModel(val repo: BLERepository) : ViewModel() {
     fun getDevices(): LiveData<List<BLEDevice>> {
         return repo.getDeviceList()
     }
+
+    fun getScanStatus(): LiveData<String> {
+        return repo.getScanStatus()
+    }
 }
