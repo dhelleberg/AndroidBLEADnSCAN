@@ -77,7 +77,7 @@ class BLEAdvertisingService : Service() {
         val serviceData = eid_counter.toString() //the 16byte identifier
         bleAdvertisingRepository.setCurrentEID( serviceData )
         //val seviceData = "1" //the 16byte identifier
-        dataBuilder.addServiceData(Constants.SERVICE_UUID, serviceData.toByteArray())
+        dataBuilder.addManufacturerData(Constants.MANUFACTURER_ID, serviceData.toByteArray(Charsets.UTF_8))
         return dataBuilder.build()
     }
 

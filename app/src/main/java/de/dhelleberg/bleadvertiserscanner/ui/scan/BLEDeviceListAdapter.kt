@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import de.dhelleberg.bleadvertiserscanner.Constants
 import de.dhelleberg.bleadvertiserscanner.R
 import de.dhelleberg.bleadvertiserscanner.data.BLEDevice
+import java.nio.charset.Charset
 
 class BLEDeviceListAdapter(val items: ArrayList<BLEDevice>) :  RecyclerView.Adapter<BLEDeviceListAdapter.ViewHolder>() {
 
@@ -47,7 +48,8 @@ class BLEDeviceListAdapter(val items: ArrayList<BLEDevice>) :  RecyclerView.Adap
                 uuid -> if(uuid == Constants.SERVICE_UUID) {
                     rssi_view.setBackgroundColor(Color.RED)
                     device_add_data.visibility = View.VISIBLE
-                    device_add_data.text = device.scanRecord.serviceData.get(uuid).toString()
+                    device_add_data.text = device.scanRecord.getManufacturerSpecificData(Constants.MANUFACTURER_ID)?.toString(
+                        Charsets.UTF_8)
                 }
             }
         }
