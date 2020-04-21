@@ -9,5 +9,8 @@ class BLEAdvertisingViewModel(val repo: BLEAdvertisingRepository): ViewModel()  
     fun getStatus(): LiveData<String> {
         return repo.getAdvertisingStatus()
     }
+    fun getEID(): LiveData<String> {
+        return repo.getCurrentEID()
+    }
 
 }

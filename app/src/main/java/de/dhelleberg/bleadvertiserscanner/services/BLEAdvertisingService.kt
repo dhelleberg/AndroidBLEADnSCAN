@@ -28,13 +28,14 @@ class BLEAdvertisingService : Service() {
     private lateinit var handler: Handler
     // Binder given to clients
     private val binder = LocalBinder()
-
+    private var eid_counter = 1234567890000000
 
     override fun onCreate() {
         super.onCreate()
+        handler = Handler()
         bluetoothAdapter =
             (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
-        startAdvertising()
+
     }
 
 
@@ -52,8 +53,9 @@ class BLEAdvertisingService : Service() {
     }
 
     fun stopAdvertising() {
-        Log.d(TAG,"Service: Starting Advertising")
+        Log.d(TAG,"Service: stopped Advertising")
         bluetoothAdapter?.bluetoothLeAdvertiser?.stopAdvertising(advertiseCallback)
+        bleAdvertisingRepository.setAdAdvertisingStatus("stopped")
         advertising = false
     }
 
@@ -70,11 +72,12 @@ class BLEAdvertisingService : Service() {
         dataBuilder.addServiceUuid(Constants.SERVICE_UUID)
         dataBuilder.setIncludeTxPowerLevel(false)
         dataBuilder.setIncludeDeviceName(false)
-
+        eid_counter = eid_counter.inc()
         /* For example - this will cause advertising to fail (exceeds size limit) */
-        val seviceData = "1234567890123456" //the 16byte identifier
+        val serviceData = eid_counter.toString() //the 16byte identifier
+        bleAdvertisingRepository.setCurrentEID( serviceData )
         //val seviceData = "1" //the 16byte identifier
-        dataBuilder.addServiceData(Constants.SERVICE_UUID, seviceData.toByteArray())
+        dataBuilder.addServiceData(Constants.SERVICE_UUID, serviceData.toByteArray())
         return dataBuilder.build()
     }
 
@@ -111,7 +114,15 @@ class BLEAdvertisingService : Service() {
             Log.d(TAG,"onStartSuccess $settingsInEffect")
             advertising = true
             bleAdvertisingRepository.setAdAdvertisingStatus("started advertising")
-
+            handler.postDelayed(
+                Runnable {
+                    if(advertising) {
+                        stopAdvertising()
+                        startAdvertising()
+                    }
+                },
+                Constants.ADV_PERIOD
+            )
         }
     }
 

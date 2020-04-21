@@ -4,7 +4,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -14,12 +13,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 
 import de.dhelleberg.bleadvertiserscanner.R
 import de.dhelleberg.bleadvertiserscanner.data.BLEDevice
 import de.dhelleberg.bleadvertiserscanner.services.BLEScannerService
-import de.dhelleberg.bleadvertiserscanner.ui.main.PageViewModel
 import kotlinx.android.synthetic.main.scan_result_fragment.*
 import org.koin.android.viewmodel.ext.android.viewModel
 

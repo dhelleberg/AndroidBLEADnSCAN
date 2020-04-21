@@ -1,6 +1,11 @@
 package de.dhelleberg.bleadvertiserscanner.ui.advertising
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -8,14 +13,12 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 
 import de.dhelleberg.bleadvertiserscanner.R
+import de.dhelleberg.bleadvertiserscanner.services.BLEAdvertisingService
+import de.dhelleberg.bleadvertiserscanner.services.BLEScannerService
 import de.dhelleberg.bleadvertiserscanner.ui.scan.BLEDevicesViewModel
 import kotlinx.android.synthetic.main.advertising_fragment.*
+import kotlinx.android.synthetic.main.scan_result_fragment.*
 import org.koin.android.viewmodel.ext.android.viewModel
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
@@ -24,12 +27,10 @@ private const val ARG_PARAM2 = "param2"
  */
 class AdvertisingFragment : Fragment() {
 
+    private var bound = false
     private val bleAdvertisingViewModel: BLEAdvertisingViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
+    private lateinit var bleAdvertisingService: BLEAdvertisingService
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,6 +43,19 @@ class AdvertisingFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         bleAdvertisingViewModel.getStatus().observe(this, Observer { adv_status.text = it })
+        bleAdvertisingViewModel.getEID().observe(this, Observer { t_current_eid.text = it })
+
+        // Bind to LocalService
+        Intent(activity, BLEAdvertisingService::class.java).also { intent ->
+            activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+        adv_switch.setOnCheckedChangeListener { _, state ->
+            when(state) {
+                true -> bleAdvertisingService.startAdvertising()
+                false-> bleAdvertisingService.stopAdvertising()
+            }
+        }
+
     }
 
     companion object {
@@ -49,6 +63,24 @@ class AdvertisingFragment : Fragment() {
         fun newInstance() =
             AdvertisingFragment()
     }
+
+    /** Defines callbacks for service binding, passed to bindService()  */
+    private val connection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            val binder = service as BLEAdvertisingService.LocalBinder
+            bleAdvertisingService = binder.getService()
+            adv_switch.isChecked = bleAdvertisingService.advertising
+            bound = true
+        }
+
+        override fun onServiceDisconnected(className: ComponentName) {
+            bound = false
+        }
+    }
+
+
 
 
 }
