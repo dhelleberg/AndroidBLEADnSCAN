@@ -22,8 +22,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="8dp"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="65" />
 
     <TextView
@@ -35,4 +36,15 @@
         app:layout_constraintBottom_toBottomOf="@+id/device_rssi"
         app:layout_constraintStart_toEndOf="@+id/device_rssi"
         tools:text="00:00:00:12" />
+
+    <TextView
+        android:id="@+id/device_add_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="097790707A"
+        tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>

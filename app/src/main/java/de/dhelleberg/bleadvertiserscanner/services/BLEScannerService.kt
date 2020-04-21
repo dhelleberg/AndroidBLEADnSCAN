@@ -91,10 +91,13 @@ class BLEScannerService : Service() {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
             if (result != null && result.device != null) {
-                bleRepository.addDeviceToCurrentScanResult(BLEDevice(result.device.name?:"unknown",
+                bleRepository.addDeviceToCurrentScanResult(BLEDevice(
+                    result.device.name?:"unknown",
                     result.timestampNanos,
                     result.rssi,
-                    result.device.address))
+                    result.device.address,
+                    result.scanRecord
+                ))
                 Log.d(TAG, "scan result: "+ (result.device))
             }
         }
@@ -106,7 +109,8 @@ class BLEScannerService : Service() {
                     bleRepository.addDeviceToCurrentScanResult(BLEDevice(result.device.name?:"unknown",
                         result.timestampNanos,
                         result.rssi,
-                        result.device.address))
+                        result.device.address,
+                        result.scanRecord))
                     Log.d(TAG, "scan result: "+ (result.device))
                 }
             }

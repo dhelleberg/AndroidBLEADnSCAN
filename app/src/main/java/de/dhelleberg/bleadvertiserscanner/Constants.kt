@@ -8,6 +8,6 @@ class Constants {
         @JvmField val SCAN_PERIOD :Long =  2000
         @JvmField val PERMISSIONS_REQUEST_LOCATION = 1
         @JvmField val SERVICE_UUID =  ParcelUuid
-            .fromString("00001234-0000-1000-8000-00805F9B34FB")
+            .fromString("00002234-0000-1000-8000-00805F9B34FB")
     }
 }

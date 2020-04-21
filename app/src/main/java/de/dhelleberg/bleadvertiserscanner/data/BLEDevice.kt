@@ -1,6 +1,14 @@
 package de.dhelleberg.bleadvertiserscanner.data
 
-data class BLEDevice (val name: String, val discovered: Long, val rssi: Int,  val address: String) {
+import android.bluetooth.le.ScanRecord
+
+data class BLEDevice(
+    val name: String,
+    val discovered: Long,
+    val rssi: Int,
+    val address: String,
+    val scanRecord: ScanRecord?
+) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
