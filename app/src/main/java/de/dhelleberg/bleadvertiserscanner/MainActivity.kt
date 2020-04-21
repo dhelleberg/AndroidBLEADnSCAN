@@ -4,23 +4,20 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.tabs.TabLayout
-import androidx.viewpager.widget.ViewPager
 import androidx.appcompat.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import de.dhelleberg.bleadvertiserscanner.services.BLEAdvertisingService
 import de.dhelleberg.bleadvertiserscanner.services.BLEScannerService
-
+import de.dhelleberg.bleadvertiserscanner.ui.advertising.AdvertisingFragment
 import de.dhelleberg.bleadvertiserscanner.ui.scan.ScanResultFragment
 
 class MainActivity : AppCompatActivity() {
@@ -33,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         viewPager.adapter = ScreenSlidePagerAdapter(this)
         val tabs: TabLayout = findViewById(R.id.tabs)
         TabLayoutMediator(tabs, viewPager) { tab, position ->
-            tab.text = "OBJECT ${(position + 1)}"
+            tab.text = resources.getStringArray(R.array.nav_tabs)[position]
         }.attach()
         val fab: FloatingActionButton = findViewById(R.id.fab)
 
@@ -102,7 +99,12 @@ class MainActivity : AppCompatActivity() {
         override fun getItemCount(): Int = 2
 
         override fun createFragment(position: Int): Fragment {
-            return ScanResultFragment.newInstance()
+            return when(position) {
+                0 -> ScanResultFragment.newInstance()
+                1 -> AdvertisingFragment.newInstance()
+                else ->
+                    ScanResultFragment.newInstance()
+            }
         }
     }
 }

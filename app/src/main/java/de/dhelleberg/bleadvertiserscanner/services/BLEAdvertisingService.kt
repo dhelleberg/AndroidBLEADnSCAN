@@ -8,22 +8,27 @@ import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.content.Context
 import android.content.Intent
+import android.os.Binder
+import android.os.Handler
 import android.os.IBinder
 import android.util.Log
-import android.widget.Toast
 import de.dhelleberg.bleadvertiserscanner.Constants
+import de.dhelleberg.bleadvertiserscanner.data.BLEAdvertisingRepository
+import org.koin.android.ext.android.inject
 
 class BLEAdvertisingService : Service() {
 
     private val TAG by lazy { BLEAdvertisingService::class.java.simpleName }
 
+    private val bleAdvertisingRepository : BLEAdvertisingRepository by inject()
 
     private var bluetoothAdapter: BluetoothAdapter? = null
+    var advertising: Boolean = false
 
+    private lateinit var handler: Handler
+    // Binder given to clients
+    private val binder = LocalBinder()
 
-    override fun onBind(intent: Intent): IBinder {
-        TODO("Return the communication channel to the service.")
-    }
 
     override fun onCreate() {
         super.onCreate()
@@ -37,7 +42,7 @@ class BLEAdvertisingService : Service() {
     /**
      * Starts BLE Advertising.
      */
-    private fun startAdvertising() {
+    fun startAdvertising() {
         //goForeground()
         Log.d(TAG,"Service: Starting Advertising")
         val settings = buildAdvertiseSettings()
@@ -45,6 +50,13 @@ class BLEAdvertisingService : Service() {
         bluetoothAdapter?.bluetoothLeAdvertiser?.startAdvertising(settings, data, advertiseCallback)
 
     }
+
+    fun stopAdvertising() {
+        Log.d(TAG,"Service: Starting Advertising")
+        bluetoothAdapter?.bluetoothLeAdvertiser?.stopAdvertising(advertiseCallback)
+        advertising = false
+    }
+
     private fun buildAdvertiseData(): AdvertiseData? {
         /**
          * Note: There is a strict limit of 31 Bytes on packets sent over BLE Advertisements.
@@ -82,12 +94,33 @@ class BLEAdvertisingService : Service() {
     private val advertiseCallback = object: AdvertiseCallback() {
         override fun onStartFailure(errorCode: Int) {
             Log.d(TAG,"onStartFailure $errorCode")
+            advertising = false
+
+            val message = when(errorCode) {
+                ADVERTISE_FAILED_ALREADY_STARTED -> "error: advertising already started"
+                ADVERTISE_FAILED_DATA_TOO_LARGE -> "error: data too large"
+                ADVERTISE_FAILED_FEATURE_UNSUPPORTED -> "error: feature unsupported"
+                ADVERTISE_FAILED_INTERNAL_ERROR -> "error: internal error"
+                ADVERTISE_FAILED_TOO_MANY_ADVERTISERS -> "error: too many advertisers"
+                    else -> "error: unknown"
+            }
+            bleAdvertisingRepository.setAdAdvertisingStatus(message)
         }
 
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
             Log.d(TAG,"onStartSuccess $settingsInEffect")
+            advertising = true
+            bleAdvertisingRepository.setAdAdvertisingStatus("started advertising")
 
         }
+    }
 
+    inner class LocalBinder : Binder() {
+        // Return this instance of LocalService so clients can call public methods
+        fun getService(): BLEAdvertisingService = this@BLEAdvertisingService
+    }
+
+    override fun onBind(intent: Intent): IBinder {
+        return binder
     }
 }
