@@ -67,6 +67,7 @@ class ScanResultFragment : Fragment() {
         super.onStart()
         bleDevicesViewModel.getDevices().observe(this, Observer { showDevices(it) })
         bleDevicesViewModel.getScanStatus().observe(this, Observer { tv_scanStatus.text = it })
+        bleDevicesViewModel.getTokens().observe(this, Observer { tv_nrTokens.text = it.size.toString() })
         device_list.adapter = bleAddapter
         // Bind to LocalService
         Intent(activity, BLEScannerService::class.java).also { intent ->

@@ -48,8 +48,9 @@ class BLEDeviceListAdapter(val items: ArrayList<BLEDevice>) :  RecyclerView.Adap
                 uuid -> if(uuid == Constants.SERVICE_UUID) {
                     rssi_view.setBackgroundColor(Color.RED)
                     device_add_data.visibility = View.VISIBLE
-                    device_add_data.text = device.scanRecord.getManufacturerSpecificData(Constants.MANUFACTURER_ID)?.toString(
-                        Charsets.UTF_8)
+                    /*device_add_data.text = device.scanRecord.getManufacturerSpecificData(Constants.MANUFACTURER_ID)?.toString(
+                        Charsets.UTF_8)*/
+                    device_add_data.text = device.scanRecord.getServiceData(Constants.SERVICE_UUID)?.toString(Charsets.UTF_8)
                 }
             }
         }
